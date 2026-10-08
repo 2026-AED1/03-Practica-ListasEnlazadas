@@ -1,6 +1,6 @@
 # historial.py
 # Practica 3 - Historial de navegador con atras/adelante (LeetCode #1472),
-# construido sobre TU ListaDoble. Trabajo de CASA (Ejercicio 3).
+# construido sobre TU ListaDoble. Parte 3: se explica en clase y se programa en CASA.
 #
 # No hace falta ninguna estructura nueva (ni diccionario ni tabla hash): las
 # paginas van en una ListaDoble y un unico puntero, 'actual', dice en que
@@ -35,10 +35,7 @@ class BrowserHistory:
         # Coste: O(?)   (pista: "amortizado")
         # TODO:
         # 1. Descartar todas las paginas que hay POR DELANTE de self.actual.
-        #    Tienen que quedar desenganchadas de verdad (Ejercicio 4): si solo
-        #    cortas el enlace actual.siguiente, las paginas descartadas siguen
-        #    apuntandose entre si y forman un ciclo. Pista: tu ListaDoble ya
-        #    sabe borrar por el final dejando los punteros a None.
+        #    Pista: tu ListaDoble ya sabe borrar por el final.
         # 2. Enlazar un nodo nuevo con url justo detras de self.actual.
         # 3. Mover self.actual a ese nodo nuevo.
         raise NotImplementedError

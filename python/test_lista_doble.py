@@ -9,19 +9,16 @@
 # o cola apuntando a un nodo que ya no esta en la lista).
 #
 # Se ejecuta por grupos, en el mismo orden en que se programa en clase:
-#   python3 -m unittest -v test_lista_doble.PruebasInsercion          # clase
-#   python3 -m unittest -v test_lista_doble.PruebasInsercionRelativa  # clase
-#   python3 -m unittest -v test_lista_doble.PruebasBorrado            # clase
-#   python3 -m unittest -v test_lista_doble.PruebaContraList          # clase
-#   python3 -m unittest -v test_lista_doble.PruebasPalindromo         # clase
-#   python3 -m unittest -v test_lista_doble.PruebasReverse            # casa
-#   python3 -m unittest -v test_lista_doble.PruebasIntercalar         # casa
-#   python3 -m unittest -v test_lista_doble.PruebasMemoria         # casa (Ejercicio 4)
-#   python3 -m unittest -v test_lista_doble.PruebasRotar           # reto opcional
+#   python3 -m unittest -v test_lista_doble.PruebasInsercion
+#   python3 -m unittest -v test_lista_doble.PruebasInsercionRelativa
+#   python3 -m unittest -v test_lista_doble.PruebasBorrado
+#   python3 -m unittest -v test_lista_doble.PruebaContraList
+#   python3 -m unittest -v test_lista_doble.PruebasPalindromo
+# Ampliacion (opcional; se saltan mientras no esten hechos):
+#   PruebasReverse, PruebasIntercalar, PruebasRotar
 # Todo:
 #   python3 -m unittest -v test_lista_doble
 
-import gc
 import random
 import unittest
 
@@ -29,6 +26,13 @@ from lista_doble import ListaDoble, NodoDoble
 
 
 class PruebaBase(unittest.TestCase):
+    def opcional(self, funcion, *args):
+        # Ejecuta un metodo de la ampliacion; si no esta hecho, salta la prueba.
+        try:
+            return funcion(*args)
+        except NotImplementedError:
+            self.skipTest("ampliacion opcional sin implementar")
+
     def comprobar(self, lista, esperado, despues_de=""):
         self.assertTrue(lista.invariante_correcto(),
                         f"invariante roto tras {despues_de}")
@@ -167,24 +171,25 @@ class PruebasInsercionRelativa(PruebaBase):
 
 
 class PruebasReverse(PruebaBase):
+    # Ampliacion opcional: si reverse no esta hecho, estas pruebas se saltan.
     def test_reverse(self):
         for valores in ([], [1], [1, 2], [1, 2, 3, 4, 5]):
             with self.subTest(valores=valores):
                 l = ListaDoble(valores)
-                l.reverse()
+                self.opcional(l.reverse)
                 self.comprobar(l, valores[::-1], f"reverse de {valores}")
 
     def test_reverse_no_crea_nodos(self):
         l = ListaDoble([1, 2, 3])
         nodos = [l.cabeza, l.cabeza.siguiente, l.cola]
-        l.reverse()
+        self.opcional(l.reverse)
         self.assertIs(l.cabeza, nodos[2])
         self.assertIs(l.cabeza.siguiente, nodos[1])
         self.assertIs(l.cola, nodos[0])
 
     def test_reverse_y_despues_insertar(self):
         l = ListaDoble([1, 2, 3])
-        l.reverse()
+        self.opcional(l.reverse)
         l.insert_last(0)
         l.insert_first(4)
         self.comprobar(l, [4, 3, 2, 1, 0], "insertar tras reverse")
@@ -251,9 +256,10 @@ class PruebaContraList(PruebaBase):
 
 
 class PruebasIntercalar(PruebaBase):
+    # Ampliacion opcional: si intercalar no esta hecho, estas pruebas se saltan.
     def caso(self, a, b, esperado):
         la, lb = ListaDoble(a), ListaDoble(b)
-        la.intercalar(lb)
+        self.opcional(la.intercalar, lb)
         self.comprobar(la, esperado, f"intercalar({a}, {b})")
         self.comprobar(lb, b, "intercalar (la otra lista no debe cambiar)")
         la.insert_last("x")                 # destapa una cola mal actualizada
@@ -274,57 +280,11 @@ class PruebasIntercalar(PruebaBase):
         self.caso([], [], [])
 
 
-class PruebasMemoria(PruebaBase):
-    # Ejercicio 4. En una lista doble, dos nodos vecinos se apuntan entre si:
-    # forman un CICLO de referencias. El contador de referencias de Python no
-    # puede liberar un ciclo; solo lo hace el recolector de ciclos (gc), que
-    # pasa "de vez en cuando". Aqui se desactiva para ver que libera cada
-    # operacion por si sola, igual que el contador de nodos vivos en C++.
-    def setUp(self):
-        gc.collect()
-        gc.disable()
-
-    def tearDown(self):
-        gc.enable()
-
-    def test_delete_deja_los_punteros_a_none(self):
-        l = ListaDoble([1, 2, 3])
-        nodos = [l.cabeza, l.cabeza.siguiente, l.cola]
-        l.delete_node(nodos[1])
-        l.delete_first()
-        l.delete_last()
-        for nodo in nodos:
-            self.assertIsNone(nodo.anterior, f"{nodo}.anterior")
-            self.assertIsNone(nodo.siguiente, f"{nodo}.siguiente")
-
-    def test_vaciar_libera_todos_los_nodos(self):
-        antes = NodoDoble.vivos
-        l = ListaDoble(range(1000))
-        self.assertEqual(NodoDoble.vivos, antes + 1000)
-        l.vaciar()
-        self.comprobar(l, [], "vaciar")
-        self.assertEqual(NodoDoble.vivos, antes,
-                         "vaciar() debe dejar los nodos sin referencias")
-
-    def test_copiar_es_profunda(self):
-        a = ListaDoble([1, 2, 3])
-        b = a.copiar()
-        self.assertIsNot(b, a)
-        self.assertIsNot(b.cabeza, a.cabeza)
-        b.insert_last(4)
-        a.delete_first()
-        self.comprobar(a, [2, 3], "modificar el original")
-        self.comprobar(b, [1, 2, 3, 4], "modificar la copia")
-
-
 class PruebasRotar(PruebaBase):
-    # Reto opcional: si rotar no esta hecho, estas pruebas se saltan.
+    # Ampliacion opcional: si rotar no esta hecho, estas pruebas se saltan.
     def rotar(self, valores, k, derecha=True):
         l = ListaDoble(valores)
-        try:
-            l.rotar(k, derecha)
-        except NotImplementedError:
-            self.skipTest("rotar() es opcional y no esta implementado")
+        self.opcional(l.rotar, k, derecha)
         return l
 
     def test_rotar_derecha(self):
@@ -340,10 +300,7 @@ class PruebasRotar(PruebaBase):
     def test_rotar_no_crea_nodos(self):
         l = ListaDoble([1, 2, 3, 4])
         nodos = {id(l.cabeza), id(l.cabeza.siguiente), id(l.cola.anterior), id(l.cola)}
-        try:
-            l.rotar(1)
-        except NotImplementedError:
-            self.skipTest("rotar() es opcional y no esta implementado")
+        self.opcional(l.rotar, 1)
         self.comprobar(l, [4, 1, 2, 3], "rotar(1)")
         nodo, despues = l.cabeza, set()
         while nodo is not None:

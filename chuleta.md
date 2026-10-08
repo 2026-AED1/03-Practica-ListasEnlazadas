@@ -1,5 +1,15 @@
 # Chuleta — Lista doblemente enlazada e historial de navegador
 
+```
+    cabeza                              cola
+      │                                   │
+      ▼                                   ▼
+┌───┬────┬───┐    ┌───┬────┬───┐    ┌───┬────┬───┐
+│   │ A  │ ●─┼───►│   │ B  │ ●─┼───►│   │ C  │ × │
+│ × │    │   │◄───┼─● │    │   │◄───┼─● │    │   │    tamano = 3
+└───┴────┴───┘    └───┴────┴───┘    └───┴────┴───┘
+```
+
 ## Insertar X al inicio (lista no vacía) — 4 punteros, en este orden
 ```
 1. X.siguiente = cabeza
@@ -63,9 +73,6 @@ Misma `ListaDoble` + un puntero `actual` al nodo de la página en la que estás.
 
 ⚠️ Error nº 1: `visit()` tras `back()` sin descartar bien lo que había por delante.
 
-## Memoria
-Vecinos que se apuntan entre sí = **ciclo**. El contador de referencias no lo libera; solo el recolector de ciclos (`gc`), cuando pasa. Para liberar al momento: romper los enlaces (`vaciar()`, `delete_*` dejan los punteros a `None`).
-
 ## Costes
 | Operación | Lista simple | Lista doble | Historial |
 |---|---|---|---|
@@ -75,7 +82,7 @@ Vecinos que se apuntan entre sí = **ciclo**. El contador de referencias no lo l
 | Eliminar primero | O(1) | O(1) | — |
 | Eliminar último | O(n) | O(1) | — |
 | Eliminar nodo dado | O(n) | O(1) | — |
-| Recorrer hacia atrás | O(n²) con índices | O(n) | — |
+| Recorrer hacia atrás | no se puede (O(n²) con índices) | O(n) | — |
 | `visit` | — | — | O(1) amortizado |
 | `back` / `forward` | — | — | O(min(steps, n)) |
 

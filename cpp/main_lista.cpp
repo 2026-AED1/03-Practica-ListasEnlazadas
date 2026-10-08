@@ -49,12 +49,6 @@ int main() {
             auto* nodo = l.buscar(a);
             if (nodo == nullptr) out << "ERROR\n";
             else out << l.delete_node(nodo) << "\n";
-        } else if (orden == "reverse") {
-            l.reverse();
-        } else if (orden == "intercalar") {
-            ListaDoble<std::string> otra;
-            while (in >> x) otra.insert_last(x);
-            l.intercalar(otra);
         } else if (orden == "palindromo") {
             out << (l.es_palindromo() ? "SI" : "NO") << "\n";
         } else if (orden == "size") {

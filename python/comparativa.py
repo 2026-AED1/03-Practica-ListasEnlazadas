@@ -1,4 +1,4 @@
-# comparativa.py
+# comparativa.py  --  AMPLIACION OPCIONAL (no puntua)
 # Objetivo: comprobar con el reloj lo que dice la teoria: un segundo puntero
 # (anterior) convierte en O(1) operaciones que en la lista simple son O(n)...
 # y averiguar cuanto cuesta ese puntero en memoria.
@@ -17,20 +17,18 @@
 #   B) borrar nodos de los que ya tenemos la referencia
 #   C) recorrer hacia atras
 #   D) memoria por elemento: el precio del puntero 'anterior'
-#   E) nodos descartados y recolector de ciclos (Ejercicio 4)
 #
-# Ejecutar todos (alrededor de un minuto), o solo algunos:
+# Ejecutar todos (menos de un minuto), o solo algunos:
 #   python3 comparativa.py
 #   python3 comparativa.py A D
 
 import collections
-import gc
 import random
 import sys
 import time
 import tracemalloc
 
-from lista_doble import ListaDoble, NodoDoble
+from lista_doble import ListaDoble
 from lista_simple import ListaSimple
 
 
@@ -219,74 +217,13 @@ def experimento_d():
         except NotImplementedError:
             tracemalloc.stop()
             print(f"  {nombre:<22} (pendiente)")
-    gc.collect()
-
-
-# =====================================================================
-# E) Nodos descartados y recolector de ciclos
-# =====================================================================
-
-def experimento_e():
-    # Python libera un objeto en cuanto nadie lo referencia (contador de
-    # referencias). Pero en una lista doble cada par de vecinos se apuntan
-    # entre si: es un CICLO, y un ciclo nunca llega a 0 referencias. Esos
-    # nodos solo los libera el recolector de ciclos (gc), que pasa cada
-    # cierto tiempo. Aqui lo apagamos para ver que libera cada cosa por si sola.
-    n = 100_000
-    titulo = f"E) Nodos vivos con el recolector de ciclos APAGADO (n = {n})"
-    print()
-    print(titulo)
-    print("-" * len(titulo))
-    gc.collect()
-    gc.disable()
-    try:
-        base = NodoDoble.vivos
-
-        def fila(texto):
-            print(f"  {texto:<52} {NodoDoble.vivos - base:>8} nodos vivos")
-
-        l = ListaDoble(range(n))
-        fila("crear una ListaDoble de n elementos")
-        del l
-        fila("del lista  (nadie la referencia ya)")
-        t0 = time.perf_counter()
-        gc.collect()
-        t = (time.perf_counter() - t0) * 1000
-        fila(f"gc.collect()  ({t:.1f} ms)")
-
-        l = ListaDoble(range(n))
-        fila("crear otra ListaDoble de n elementos")
-        try:
-            l.vaciar()
-            fila("lista.vaciar()")
-        except NotImplementedError:
-            print(f"  {'lista.vaciar()':<52} (pendiente)")
-        del l
-        fila("del lista")
-        gc.collect()
-
-        try:
-            from historial import BrowserHistory
-            bh = BrowserHistory("inicio")
-            for i in range(n):
-                bh.visit(f"p{i}")
-            bh.back(n)
-            fila(f"historial con {n + 1} paginas, back({n})")
-            bh.visit("nueva")
-            fila("visit('nueva')  (descarta n paginas)")
-            del bh
-        except NotImplementedError:
-            print(f"  {'historial':<52} (pendiente)")
-    finally:
-        gc.enable()
-        gc.collect()
 
 
 # =====================================================================
 
 EXPERIMENTOS = {
     "A": experimento_a, "B": experimento_b, "C": experimento_c,
-    "D": experimento_d, "E": experimento_e,
+    "D": experimento_d,
 }
 
 if __name__ == "__main__":
@@ -294,7 +231,7 @@ if __name__ == "__main__":
     elegidos = [a.upper() for a in sys.argv[1:]] or list(EXPERIMENTOS)
     for letra in elegidos:
         if letra not in EXPERIMENTOS:
-            print(f"Experimento desconocido: {letra} (validos: A-E)")
+            print(f"Experimento desconocido: {letra} (validos: A-D)")
             continue
         try:
             EXPERIMENTOS[letra]()

@@ -19,3 +19,13 @@ Thumbs.db
 
 # Fichero de envio al juez (se genera con generar_envio.py)
 python/envio_historial.py
+
+# C++
+*.o
+*.exe
+*.out
+cpp/test_lista
+cpp/test_historial
+cpp/lista
+cpp/historial
+cpp/envio_*.cpp

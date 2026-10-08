@@ -1,16 +1,14 @@
 # test_historial.py
-# Pruebas del Historial de Navegador (trabajo de casa). No hay que
+# Pruebas del Historial de Navegador (trabajo de casa, Parte 3). No hay que
 # modificarlo: hay que conseguir que pase entero.
 #
 #   python3 -m unittest -v test_historial
 #
 # Necesita que la ListaDoble ya pase sus pruebas (test_lista_doble).
 
-import gc
 import unittest
 
 from historial import BrowserHistory
-from lista_doble import NodoDoble
 
 
 class PruebaBase(unittest.TestCase):
@@ -108,29 +106,6 @@ class PruebaContraList(PruebaBase):
                     pos = min(len(modelo) - 1, pos + k)
                     self.assertEqual(bh.forward(k), modelo[pos], f"paso {paso}")
             self.comprobar(bh, modelo, modelo[pos], f"paso {paso} ({op})")
-
-
-class PruebasMemoria(PruebaBase):
-    # Ejercicio 4: las paginas descartadas por visit() deben quedar libres en
-    # cuanto se descartan, sin depender del recolector de ciclos.
-    def setUp(self):
-        gc.collect()
-        gc.disable()
-
-    def tearDown(self):
-        gc.enable()
-
-    def test_visit_libera_las_paginas_descartadas(self):
-        bh = BrowserHistory("inicio")
-        for i in range(100):
-            bh.visit(f"p{i}")
-        bh.back(100)
-        antes = NodoDoble.vivos
-        bh.visit("nueva")                # descarta 100 paginas, crea 1
-        self.comprobar(bh, ["inicio", "nueva"], "nueva", "visit que descarta 100 paginas")
-        self.assertEqual(NodoDoble.vivos, antes - 100 + 1,
-                         "las paginas descartadas siguen vivas: forman un ciclo "
-                         "de referencias (rompe sus enlaces al descartarlas)")
 
 
 if __name__ == "__main__":

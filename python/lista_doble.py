@@ -10,18 +10,14 @@
 # implementacion. Lo que ya esta escrito no se toca: los tests y el juez
 # dependen de los nombres (cabeza, cola, tamano, dato, siguiente, anterior).
 #
-# Orden de trabajo y tests de cada bloque (ver README):
-#   EN CLASE
-#     1. insert_last, __reversed__          -> test_lista_doble.PruebasInsercion
-#     2. insert_before, insert_after        -> test_lista_doble.PruebasInsercionRelativa
-#     3. delete_node, delete_first/last     -> test_lista_doble.PruebasBorrado
-#                                              test_lista_doble.PruebaContraList
-#     4. es_palindromo                      -> test_lista_doble.PruebasPalindromo
-#   EN CASA
-#     5. reverse                            -> test_lista_doble.PruebasReverse
-#     6. intercalar                         -> test_lista_doble.PruebasIntercalar
-#     7. vaciar, copiar (Ejercicio 4)       -> test_lista_doble.PruebasMemoria
-#     8. rotar (reto opcional)              -> test_lista_doble.PruebasRotar
+# Orden de trabajo (Parte 1 y 2, en clase) y tests de cada paso:
+#   1. insert_last, __reversed__          -> test_lista_doble.PruebasInsercion
+#   2. insert_before, insert_after        -> test_lista_doble.PruebasInsercionRelativa
+#   3. delete_node, delete_first/last     -> test_lista_doble.PruebasBorrado
+#                                            test_lista_doble.PruebaContraList
+#   4. es_palindromo                      -> test_lista_doble.PruebasPalindromo
+# Ampliacion (opcional): reverse, intercalar, rotar -> PruebasReverse,
+#   PruebasIntercalar, PruebasRotar (se saltan mientras no los hagas).
 #
 # Ejecutar los tests:
 #   python3 -m unittest -v test_lista_doble
@@ -32,25 +28,13 @@
 
 class NodoDoble:
     # __slots__: cada nodo solo tiene hueco para estos tres campos, sin
-    # diccionario de atributos. Ahorra memoria (experimento D).
+    # diccionario de atributos. Ahorra mucha memoria.
     __slots__ = ("dato", "siguiente", "anterior")
-
-    # Contador de nodos vivos: sube al crear un nodo y baja cuando Python lo
-    # libera. Es el mismo truco que el contador estatico de C++; lo usan los
-    # tests del Ejercicio 4 y el experimento E. No lo toques.
-    vivos = 0
 
     def __init__(self, dato):
         self.dato = dato
         self.siguiente = None
         self.anterior = None
-        NodoDoble.vivos += 1
-
-    def __del__(self):
-        NodoDoble.vivos -= 1
-
-    def __repr__(self):
-        return f"NodoDoble({self.dato!r})"
 
 
 class ListaDoble:
@@ -93,24 +77,18 @@ class ListaDoble:
             actual = actual.siguiente
 
     def __reversed__(self):                      # reversed(l)
+        actual = self.cola
+        while actual is not None:
+            yield actual.dato
+            actual = actual.anterior
+
+    def buscar(self, dato):
         # Coste de cada paso: O(?)   Recorrido completo: O(?)
         # TODO: igual que __iter__ pero empezando por la cola y yendo hacia atras.
         raise NotImplementedError
 
-    def buscar(self, dato):
-        # O(n). Devuelve el PRIMER nodo que contiene dato, o None.
-        actual = self.cabeza
-        while actual is not None:
-            if actual.dato == dato:
-                return actual
-            actual = actual.siguiente
-        return None
-
     def __str__(self):
         return "[" + " <-> ".join(repr(d) for d in self) + "]"
-
-    def __repr__(self):
-        return f"ListaDoble({list(self)!r})"
 
     def print_forward(self):
         print(" <-> ".join(str(d) for d in self))
@@ -118,9 +96,7 @@ class ListaDoble:
     def print_backward(self):
         print(" <-> ".join(str(d) for d in reversed(self)))
 
-    # --- Insercion ----------------------------------------------------------
-    # Todos los insert devuelven el nodo nuevo (asi quien llama tiene ya la
-    # referencia, como hara el historial con 'actual').
+    # --- Insercion (todos devuelven el nodo nuevo) ---------------------------
 
     def insert_first(self, dato):
         # O(1). Hecho como ejemplo: los 4 punteros de la diapositiva.
@@ -157,8 +133,7 @@ class ListaDoble:
     def delete_node(self, nodo):
         # Coste: O(?)
         # pre : nodo es un nodo de ESTA lista.
-        # post: devuelve nodo.dato. Deja nodo.anterior y nodo.siguiente a None
-        #       (buena practica: el nodo queda totalmente desenganchado).
+        # post: devuelve nodo.dato y deja nodo.anterior y nodo.siguiente a None.
         # TODO: reconectar el enlace izquierdo (o mover cabeza si nodo era la cabeza)
         # TODO: reconectar el enlace derecho (o mover cola si nodo era la cola)
         # TODO: actualizar tamano
@@ -168,66 +143,42 @@ class ListaDoble:
         # Coste: O(?)
         # Si la lista esta vacia: raise IndexError("..."), como list.pop().
         # Devuelve el dato borrado. Pista: es un caso particular de delete_node.
-        # TODO
         raise NotImplementedError
 
     def delete_last(self):
         # Coste: O(?)
         # Si la lista esta vacia: raise IndexError("..."), como list.pop().
-        # TODO
         raise NotImplementedError
 
-    # --- Operaciones sobre la lista entera ------------------------------------
-
-    def reverse(self):
-        # Coste: O(?). Sin crear nodos nuevos.   (CASA)
-        # TODO: en cada nodo, intercambia .anterior y .siguiente
-        #       (en Python: a, b = b, a). Ojo: despues del intercambio, el
-        #       "siguiente" original esta en .anterior.
-        # TODO: al final, intercambia cabeza y cola.
-        raise NotImplementedError
+    # --- Palindromo ---------------------------------------------------------
 
     def es_palindromo(self):
         # Coste: O(?) en tiempo y O(?) en memoria auxiliar.
-        # TODO: dos punteros, uno desde la cabeza y otro desde la cola, que
-        #       avanzan hacia el centro. Basta con tamano // 2 comparaciones.
+        # TODO: dos punteros, inicio = self.cabeza y fin = self.cola, que
+        #       avanzan hacia el centro. Bastan tamano // 2 comparaciones.
+        raise NotImplementedError
+
+    # --- Ampliacion (opcional, no puntua) -------------------------------------
+
+    def reverse(self):
+        # Coste: O(?). Sin crear nodos nuevos.
+        #   [1, 2, 3] -> [3, 2, 1]
+        # TODO: en cada nodo, intercambia .anterior y .siguiente
+        #       (a, b = b, a); al final, intercambia cabeza y cola.
         raise NotImplementedError
 
     def intercalar(self, otra):
-        # Coste: O(?)   (CASA, Ejercicio 2)
-        # Inserta en self los datos de otra, alternandolos; si una de las dos
-        # es mas larga, lo que sobra queda al final. otra NO se modifica.
+        # Coste: O(?). otra NO se modifica.
         #   [1, 3, 5].intercalar([2, 4, 6, 8, 10]) -> [1, 2, 3, 4, 5, 6, 8, 10]
-        # TODO: recorre self con un puntero y otra con un for; usa insert_after
-        #       sobre el nodo de self y, cuando self se acabe, insert_last.
+        # TODO: usa insert_after sobre el nodo actual de self y, cuando self
+        #       se acabe, insert_last.
         raise NotImplementedError
-
-    # --- Ejercicio 4 (CASA): limpieza de memoria ---------------------------
-
-    def vaciar(self):
-        # Coste: O(?)
-        # Deja la lista vacia ROMPIENDO todos los enlaces entre nodos, para que
-        # Python pueda liberar cada nodo al instante (ver README, Ejercicio 4).
-        # Es el equivalente en Python al destructor de la lista en C++.
-        # TODO
-        raise NotImplementedError
-
-    def copiar(self):
-        # Coste: O(?)
-        # Devuelve una ListaDoble NUEVA, con nodos nuevos y los mismos datos.
-        # (En Python "b = a" no copia nada: solo da otro nombre a la misma lista.)
-        # TODO
-        raise NotImplementedError
-
-    # --- Reto opcional (CASA) ----------------------------------------------
 
     def rotar(self, k, derecha=True):
         # Coste: O(?). Sin crear nodos nuevos.
         #   [1,2,3,4,5].rotar(2)                -> [4,5,1,2,3]
         #   [1,2,3,4,5].rotar(2, derecha=False) -> [3,4,5,1,2]
-        # Pista: normaliza k %= tamano, localiza el nodo que sera la nueva
-        #        cola y reconecta cabeza y cola.
-        # TODO
+        # TODO: normaliza k %= tamano, localiza la nueva cola y reconecta.
         raise NotImplementedError
 
     # --- Comprobacion explicita del invariante (no se toca) --------------
@@ -261,7 +212,6 @@ def main_lista():
     #   insert_first X | insert_last X       insertar X al principio / al final
     #   insert_before A X | insert_after A X  insertar X antes / despues del primer A
     #   delete_first | delete_last | delete A borrar (escribe el dato borrado)
-    #   reverse | intercalar X Y Z ...        invertir / intercalar con [X, Y, Z...]
     #   palindromo | size | print | print_back
     # Si no se puede borrar o no existe A, se escribe ERROR. Lista vacia: "-".
     import sys
@@ -290,10 +240,6 @@ def main_lista():
         elif orden == "delete":
             nodo = l.buscar(args[0])
             salida.append("ERROR" if nodo is None else l.delete_node(nodo))
-        elif orden == "reverse":
-            l.reverse()
-        elif orden == "intercalar":
-            l.intercalar(ListaDoble(args))
         elif orden == "palindromo":
             salida.append("SI" if l.es_palindromo() else "NO")
         elif orden == "size":

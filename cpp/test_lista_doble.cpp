@@ -10,9 +10,9 @@
 //   ./test_lista
 //   ./test_lista PruebasInsercion PruebasBorrado
 // Grupos, en el orden de trabajo:
-//   clase: PruebasInsercion PruebasInsercionRelativa PruebasBorrado
-//          PruebaContraVector PruebasPalindromo
-//   casa:  PruebasReverse PruebasIntercalar PruebasMemoria PruebasRotar (opcional)
+//   obligatorio: PruebasInsercion PruebasInsercionRelativa PruebasBorrado
+//                PruebaContraVector PruebasPalindromo PruebasMemoria
+//   ampliacion:  PruebasReverse PruebasIntercalar PruebasRotar (opcional)
 
 #include <algorithm>
 #include <random>
@@ -35,6 +35,17 @@ static void comprobar(const ListaDoble<T>& l, std::vector<T> esperado, const std
 }
 
 static int vivos() { return Lista::Nodo::vivos + ListaS::Nodo::vivos; }
+
+// Ejecuta una operacion de la ampliacion; si sigue en TODO, la prueba se salta.
+template <typename F>
+static void opcional(F f) {
+    try {
+        f();
+    } catch (const std::logic_error& e) {
+        if (std::string(e.what()).rfind("TODO", 0) == 0) throw mini_test::Saltar("ampliacion opcional");
+        throw;
+    }
+}
 
 // ---------------------------------------------------------------- insercion
 
@@ -205,14 +216,14 @@ PRUEBA(PruebasPalindromo, no_palindromos) {
     }
 }
 
-// ---------------------------------------------------------------- reverse (casa)
+// ---------------------------------------------------------------- reverse (ampliacion)
 
 PRUEBA(PruebasReverse, reverse) {
     std::vector<std::vector<int>> casos = {{}, {1}, {1, 2}, {1, 2, 3, 4, 5}};
     for (auto v : casos) {
         Lista l;
         for (int x : v) l.insert_last(x);
-        l.reverse();
+        opcional([&] { l.reverse(); });
         std::reverse(v.begin(), v.end());
         comprobar(l, v, "reverse");
     }
@@ -222,20 +233,20 @@ PRUEBA(PruebasReverse, no_crea_nodos_y_permite_insertar) {
     Lista l{1, 2, 3};
     Lista::Nodo* primero = l.cabeza;
     int antes = vivos();
-    l.reverse();
+    opcional([&] { l.reverse(); });
     COMPROBAR(vivos() == antes && l.cola == primero, "reverse no debe crear ni borrar nodos");
     l.insert_last(0);
     l.insert_first(4);
     comprobar(l, {4, 3, 2, 1, 0}, "insertar tras reverse");
 }
 
-// ---------------------------------------------------------------- intercalar (casa)
+// ---------------------------------------------------------------- intercalar (ampliacion)
 
 static void caso_intercalar(std::vector<int> a, std::vector<int> b, std::vector<int> esperado) {
     Lista la, lb;
     for (int x : a) la.insert_last(x);
     for (int x : b) lb.insert_last(x);
-    la.intercalar(lb);
+    opcional([&] { la.intercalar(lb); });
     comprobar(la, esperado, "intercalar");
     comprobar(lb, b, "intercalar (la otra lista no debe cambiar)");
     la.insert_last(99);
@@ -252,7 +263,7 @@ PRUEBA(PruebasIntercalar, vacias) {
     caso_intercalar({}, {}, {});
 }
 
-// ---------------------------------------------------------------- memoria (casa)
+// ---------------------------------------------------------------- memoria (solo C++)
 
 PRUEBA(PruebasMemoria, destructor_libera_todo) {
     int antes = vivos();
@@ -306,11 +317,7 @@ PRUEBA(PruebasMemoria, operador_asignacion) {
 static void rotar_y_comprobar(std::vector<int> v, int k, bool derecha, std::vector<int> esperado) {
     Lista l;
     for (int x : v) l.insert_last(x);
-    try {
-        l.rotar(k, derecha);
-    } catch (const std::logic_error&) {
-        throw mini_test::Saltar("rotar() es opcional");
-    }
+    opcional([&] { l.rotar(k, derecha); });
     comprobar(l, esperado, "rotar(" + std::to_string(k) + (derecha ? ")" : ", false)"));
 }
 

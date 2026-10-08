@@ -11,11 +11,9 @@ delete_first
 delete_last
 print
 size
-reverse
-print_back
-insert_last R
-insert_first R
+insert_last A
 palindromo
-intercalar 1 2 3 4
-print
+insert_first B
+print_back
+palindromo
 delete Q

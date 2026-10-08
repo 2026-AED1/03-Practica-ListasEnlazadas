@@ -7,17 +7,15 @@
 // sustituye cada "O(?)" por el coste que consigue tu implementacion.
 //
 // Orden de trabajo y grupos de tests (ver README, seccion C++):
-//   EN CLASE
+//   OBLIGATORIO (igual que en Python)
 //     1. insert_last, to_vector_backward     -> PruebasInsercion
 //     2. insert_before, insert_after         -> PruebasInsercionRelativa
 //     3. delete_node, delete_first/last      -> PruebasBorrado, PruebaContraVector
 //     4. es_palindromo                       -> PruebasPalindromo
-//   EN CASA
-//     5. reverse                             -> PruebasReverse
-//     6. intercalar                          -> PruebasIntercalar
-//     7. destructor, vaciar, constructor de
-//        copia y operator= (Ejercicio 4)     -> PruebasMemoria
-//     8. rotar (reto opcional)               -> PruebasRotar
+//     5. SOLO EN C++: destructor, vaciar, constructor de copia y
+//        operator= (en C++ sin ellos hay memory leaks)  -> PruebasMemoria
+//   AMPLIACION (opcional, no puntua)
+//     reverse -> PruebasReverse, intercalar -> PruebasIntercalar, rotar -> PruebasRotar
 //
 // Compilar y ejecutar los tests (desde la carpeta cpp/):
 //   g++ -std=c++17 -Wall test_lista_doble.cpp -o test_lista
@@ -64,16 +62,16 @@ public:
         for (const T& d : datos) insert_last(d);
     }
 
-    // --- Ejercicio 4 (CASA): la regla de los tres ------------------------------
+    // --- Solo en C++: la regla de los tres --------------------------------------
 
     ~ListaDoble() {
-        // TODO (casa): liberar TODOS los nodos con delete (puedes llamar a vaciar()).
+        // TODO: liberar TODOS los nodos con delete (puedes llamar a vaciar()).
         // Mientras no lo hagas, los tests acabaran con "MEMORY LEAK".
     }
 
     ListaDoble(const ListaDoble& otra) {
         // Coste: O(?)
-        // TODO (casa): copia PROFUNDA: nodos nuevos con los mismos datos.
+        // TODO: copia PROFUNDA: nodos nuevos con los mismos datos.
         // Si copias solo los punteros, las dos listas compartiran nodos y el
         // segundo destructor hara delete de nodos ya liberados.
         (void)otra;
@@ -82,14 +80,14 @@ public:
 
     ListaDoble& operator=(const ListaDoble& otra) {
         // Coste: O(?)
-        // TODO (casa): si no es autoasignacion (this != &otra), vaciar y copiar.
+        // TODO: si no es autoasignacion (this != &otra), vaciar y copiar.
         (void)otra;
         throw std::logic_error("TODO operator=");
     }
 
     void vaciar() {
         // Coste: O(?)
-        // TODO (casa): delete de cada nodo y dejar la lista vacia.
+        // TODO: delete de cada nodo y dejar la lista vacia.
         throw std::logic_error("TODO vaciar");
     }
 
@@ -181,7 +179,7 @@ public:
     // --- Operaciones sobre la lista entera ------------------------------------
 
     void reverse() {
-        // Coste: O(?). Sin crear nodos.   (CASA)
+        // Coste: O(?). Sin crear nodos.   (ampliacion opcional)
         // TODO: en cada nodo, std::swap(anterior, siguiente); al final, swap(cabeza, cola).
         throw std::logic_error("TODO reverse");
     }
@@ -194,7 +192,7 @@ public:
     }
 
     void intercalar(const ListaDoble& otra) {
-        // Coste: O(?)   (CASA, Ejercicio 2). otra NO se modifica.
+        // Coste: O(?)   (ampliacion opcional). otra NO se modifica.
         //   [1, 3, 5].intercalar([2, 4, 6, 8, 10]) -> [1, 2, 3, 4, 5, 6, 8, 10]
         // TODO: recorre this con un puntero y otra con otro; usa insert_after
         //       sobre el nodo de this y, cuando this se acabe, insert_last.

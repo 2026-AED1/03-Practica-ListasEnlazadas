@@ -1,6 +1,6 @@
 // historial.hpp
 // Practica 3 - Historial de navegador (LeetCode #1472) sobre TU ListaDoble.
-// Trabajo de CASA (Ejercicio 3). Version C++ opcional.
+// Parte 3: se explica en clase y se programa en CASA. Version C++ opcional.
 //
 // Las paginas van en una ListaDoble<std::string>; 'actual' apunta al NODO de
 // la pagina en la que estamos. Sin tablas hash ni estructuras nuevas.
