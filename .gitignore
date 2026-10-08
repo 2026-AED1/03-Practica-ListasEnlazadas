@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+.ipynb_checkpoints/
+
+# Editores e IDEs
+.vscode/
+.vs/
+.idea/
+*.iml
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Ficheros de bloqueo de Office
+~$*
+
+# Fichero de envio al juez (se genera con generar_envio.py)
+python/envio_historial.py

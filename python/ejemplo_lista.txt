@@ -1,0 +1,21 @@
+insert_last B
+insert_last C
+insert_first A
+print
+print_back
+insert_after B X
+insert_before A Z
+print
+delete X
+delete_first
+delete_last
+print
+size
+reverse
+print_back
+insert_last R
+insert_first R
+palindromo
+intercalar 1 2 3 4
+print
+delete Q

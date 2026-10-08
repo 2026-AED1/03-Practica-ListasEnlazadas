@@ -1,0 +1,11 @@
+leetcode.com
+visit google.com
+visit facebook.com
+visit youtube.com
+back 1
+back 1
+forward 1
+visit linkedin.com
+forward 2
+back 2
+back 7
