@@ -77,15 +77,18 @@ class ListaDoble:
             actual = actual.siguiente
 
     def __reversed__(self):                      # reversed(l)
-        actual = self.cola
-        while actual is not None:
-            yield actual.dato
-            actual = actual.anterior
-
-    def buscar(self, dato):
         # Coste de cada paso: O(?)   Recorrido completo: O(?)
         # TODO: igual que __iter__ pero empezando por la cola y yendo hacia atras.
         raise NotImplementedError
+
+    def buscar(self, dato):
+        # O(n). Devuelve el PRIMER nodo cuyo dato es 'dato', o None si no esta.
+        actual = self.cabeza
+        while actual is not None:
+            if actual.dato == dato:
+                return actual
+            actual = actual.siguiente
+        return None
 
     def __str__(self):
         return "[" + " <-> ".join(repr(d) for d in self) + "]"
