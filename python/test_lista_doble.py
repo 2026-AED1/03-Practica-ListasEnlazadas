@@ -3,7 +3,8 @@
 # que conseguir que pase entero.
 #
 # Todas las pruebas comprueban, ademas del resultado, el INVARIANTE de la
-# representacion despues de cada operacion. Un fallo "invariante roto tras
+# representacion despues de cada operacion (y el recorrido hacia atras en
+# cuanto __reversed__ esta hecho; mientras no, solo falla test_reversed). Un fallo "invariante roto tras
 # ..." significa que el resultado puede parecer correcto pero la estructura
 # interna ha quedado inconsistente (tipico: un .anterior que no se actualizo,
 # o cola apuntando a un nodo que ya no esta en la lista).
@@ -38,7 +39,13 @@ class PruebaBase(unittest.TestCase):
                         f"invariante roto tras {despues_de}")
         self.assertEqual(len(lista), len(esperado), f"tamano tras {despues_de}")
         self.assertEqual(list(lista), esperado, f"recorrido hacia delante tras {despues_de}")
-        self.assertEqual(list(reversed(lista)), esperado[::-1],
+        try:
+            hacia_atras = list(reversed(lista))
+        except NotImplementedError:
+            # __reversed__ sigue en TODO (paso 1): de momento no se comprueba
+            # aqui; lo comprueba test_reversed. El invariante ya revisa .anterior.
+            return
+        self.assertEqual(hacia_atras, esperado[::-1],
                          f"recorrido hacia atras tras {despues_de}")
 
 
@@ -54,6 +61,14 @@ class PruebasInsercion(PruebaBase):
             l.insert_last(v)
         self.comprobar(l, [10, 20, 30], "insert_last")
         self.assertEqual(l.cola.anterior.dato, 20)
+
+    def test_reversed(self):
+        # reversed(l) llama a __reversed__ (TODO del paso 1).
+        self.assertEqual(list(reversed(ListaDoble())), [])
+        l = ListaDoble()
+        for v in [1, 2, 3]:
+            l.insert_first(v)                    # ya hecho: [3, 2, 1]
+        self.assertEqual(list(reversed(l)), [1, 2, 3])
 
     def test_insert_first(self):
         l = ListaDoble()
